@@ -1,0 +1,40 @@
+# Ignore JetBrains IDEs project files
+.idea/
+*.iml
+*.iws
+
+# User-specific files
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/dictionaries/
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml
+
+# PhpStorm caches, logs, and other system files
+.idea/**/usage.statistics.xml
+.idea/**/shelf/
+.idea/**/dataSources.ids
+.idea/**/dataSources.xml
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/webServers.xml
+
+# Ignore deployment configs
+.idea/deployment.xml
+
+# Ignore coverage and test reports
+.idea/**/coverage/
+
+# Ignore generated files by PhpStorm
+out/
+
+# Ignore logs and temp files
+*.log
+*.tmp
+*.temp
+
+# Ignore OS files
+.DS_Store
+Thumbs.db

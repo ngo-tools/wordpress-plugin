@@ -1,0 +1,46 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: de_DE\n"
+
+msgid "Please fill the %s field."
+msgstr "Bitte füllen Sie das Feld %s aus."
+
+msgid "Please enter a valid email address."
+msgstr "Bitte geben Sie eine gültige E-Mail-Adresse ein."
+
+msgid "No valid fields specified."
+msgstr "Es wurden keine gültigen Felder angegeben."
+
+msgid "Failed to subscribe: "
+msgstr "Anmeldung fehlgeschlagen: "
+
+msgid "Thank you for subscribing!"
+msgstr "Vielen Dank für Ihre Anmeldung!"
+
+msgid "Subscribe"
+msgstr "Abonnieren"
+
+msgid "API Bearer Token"
+msgstr "API-Bearer-Token"
+
+msgid "Organization name"
+msgstr "Organizationsname"
+
+msgid "Enter the full URL of the API endpoint."
+msgstr "Geben Sie die vollständige URL des API-Endpunkts ein."
+
+msgid "Newsletter API Settings"
+msgstr "Newsletter-API-Einstellungen"
+
+msgid "Newsletter API"
+msgstr "Newsletter-API"
+
+msgid "Select Segment"
+msgstr "Segment auswählen"
+
+msgid "Please select a segment"
+msgstr "Bitte wählen Sie ein Segment"
+
+msgid "The token seems to be expired"
+msgstr "Das Token scheint abgelaufen zu sein"
