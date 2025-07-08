@@ -2,7 +2,7 @@
 /*
 Plugin Name: NGO Tools newsletter subscription form
 Description: Newsletter subscription form sending data as JSON via cURL POST with Bearer Token authentication, AJAX support, localization, and admin settings including API endpoint URL and segment selection.
-Version: 1.4
+Version: 1.0
 Author: David Recinos
 Text Domain: ngo_tools_newsletter
 Domain Path: /languages
@@ -26,7 +26,7 @@ add_action('wp_enqueue_scripts', function () {
         'newsletter-form-js',
         plugin_dir_url(__FILE__) . 'js/newsletter-form.js',
         ['jquery'],
-        '1.4',
+        '1.0',
         true
     );
     wp_localize_script('newsletter-form-js', 'ngo_tools_ajax_obj', [
@@ -43,33 +43,32 @@ add_shortcode('ngo_tools_newsletter_api_form', function ($attributes) {
 
     ob_start();
     ?>
-    <form id="ngo-tools-newsletter-form" class="newsletter-form" method="post" novalidate>
 
-        <?php if(($attributes['form-labels'] == 'true')){ ?>
-        <label class="ngo_tools_newsletter_form_label"><?php echo esc_html_e('First Name', 'ngo_tools_newsletter'); ?></label><br>
-        <?php } ?>
-            <input class="ngo_tools_newsletter_form_input"
-                   placeholder="<?php echo esc_html_e('First Name', 'ngo_tools_newsletter'); ?>"
-                   type="text" name="ngo_tools_firstName" required>
-        <br>
-        <?php if(($attributes['form-labels'] == 'true')){ ?>
-        <label class="ngo_tools_newsletter_form_label"><?php echo esc_html_e('Last Name', 'ngo_tools_newsletter'); ?></label><br>
-        <?php } ?>
-            <input class="ngo_tools_newsletter_form_input" placeholder="<?php echo esc_html_e('Last Name', 'ngo_tools_newsletter'); ?>"
-                   type="text" name="ngo_tools_lastName" required>
-        <br>
-        <?php if(($attributes['form-labels'] == 'true')){ ?>
-        <label class="ngo_tools_newsletter_form_label"><?php echo esc_html_e('Email', 'ngo_tools_newsletter'); ?></label> <br>
-        <?php } ?>
-            <input class="ngo_tools_newsletter_form_input" placeholder="<?php echo esc_html_e('Email', 'ngo_tools_newsletter'); ?>"
-                   type="email" name="ngo_tools_email" required>
-        <br>
+    <form id="ngo-tools-newsletter-form" class="ngo_tools_newsletter-form" method="post" novalidate>
+
+        <?php ngo_tools_render_input('text', 'ngo_tools_firstName', 'First Name', $attributes) ?>
+        <?php ngo_tools_render_input('text', 'ngo_tools_lastName', 'Last Name', $attributes) ?>
+        <?php ngo_tools_render_input('email', 'ngo_tools_email', 'Email', $attributes) ?>
+        <p class="ngo_tools_newsletter_form_field">
         <input class="ngo_tools_newsletter_form_button" type="submit" value="<?php echo esc_attr__('Subscribe', 'ngo_tools_newsletter'); ?>">
+        </p>
     </form>
-    <div id="ngo-message" style="margin-top:15px;"></div>
+    <div id="ngo-message" class="ngo_tools_notice" style="margin-top:15px;"></div>
     <?php
     return ob_get_clean();
 });
+
+function ngo_tools_render_input($type, $name, $placeholder, $attributes){
+    ?>
+        <p class="ngo_tools_newsletter_form_field">
+        <?php if(($attributes['form-labels'] == 'true')){ ?>
+        <label class="ngo_tools_newsletter_form_label"><?php echo esc_html_e($placeholder, 'ngo_tools_newsletter'); ?></label> <br>
+        <?php } ?>
+            <input class="ngo_tools_newsletter_form_input" placeholder="<?php echo esc_html_e($placeholder, 'ngo_tools_newsletter'); ?>"
+                   type="<?php echo esc_html_e($type) ?>" name="<?php echo esc_html_e($name) ?>" required>
+        </p>
+    <?php
+}
 
 // AJAX handler
 add_action('wp_ajax_nopriv_ngo_tools_submit_form', 'ngo_tools_ajax_form_handler');
@@ -92,7 +91,7 @@ function ngo_tools_ajax_form_handler()
     foreach ($fields as $field) {
         $key = 'ngo_tools_' . $field;
         if (empty($_POST[$key])) {
-            $errors[] = sprintf(__('Please fill the %s field.', 'ngo_tools_newsletter'), ucfirst($field));
+            $errors[] = sprintf(__('Please fill the %s field.', 'ngo_tools_newsletter'), __($field, 'ngo_tools_newsletter'));
         } else {
             $value = sanitize_text_field(wp_unslash($_POST[$key]));
             if ($field === 'email' && !is_email($value)) {

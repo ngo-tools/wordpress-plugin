@@ -53,3 +53,12 @@ msgstr "Nachname"
 
 msgid "Email"
 msgstr "E-Mail-Addresse"
+
+msgid "email"
+msgstr "E-Mail-Addresse"
+
+msgid "firstName"
+msgstr "Vorname"
+
+msgid "lastName"
+msgstr "Nachname"

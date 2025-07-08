@@ -35,10 +35,12 @@ jQuery(document).ready(function($) {
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    $msg.css('color', 'green').html(response.data.messages.join('<br>'));
+                    $msg.removeClass('ngo_tools_notice-error').addClass('ngo_tools_notice-success')
+                        .html(response.data.messages.join('<br>'));
                     $form[0].reset();
                 } else {
-                    $msg.css('color', 'red').html(response.data.messages.join('<br>'));
+                    $msg.removeClass('ngo_tools_notice-success').addClass('ngo_tools_notice-error')
+                        .html(response.data.messages.join('<br>'));
                 }
             },
             error: function() {
