@@ -44,3 +44,12 @@ msgstr "Bitte wählen Sie ein Segment"
 
 msgid "The token seems to be expired"
 msgstr "Das Token scheint abgelaufen zu sein"
+
+msgid "First Name"
+msgstr "Vorname"
+
+msgid "Last Name"
+msgstr "Nachname"
+
+msgid "Email"
+msgstr "E-Mail-Addresse"
