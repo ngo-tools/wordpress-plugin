@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-    $('#newsletter-form').on('submit', function(e) {
+    $('#ngo-tools-newsletter-form').on('submit', function(e) {
         e.preventDefault();
 
         var $form = $(this);
@@ -7,8 +7,8 @@ jQuery(document).ready(function($) {
         $msg.html(''); // clear previous messages
 
         var fields = [];
-        $form.find('input[name^="ngo_"]').each(function() {
-            var name = $(this).attr('name').replace('ngo_', '');
+        $form.find('input[name^="ngo_tools_"]').each(function() {
+            var name = $(this).attr('name').replace('ngo_tools_', '');
             if (fields.indexOf(name) === -1) {
                 fields.push(name);
             }
@@ -21,15 +21,15 @@ jQuery(document).ready(function($) {
             return item.name !== 'fields[]';
         });
 
-        formData.push({name: 'action', value: 'ngo_submit_form'});
-        formData.push({name: 'nonce', value: ngo_ajax_obj.nonce});
+        formData.push({name: 'action', value: 'ngo_tools_submit_form'});
+        formData.push({name: 'nonce', value: ngo_tools_ajax_obj.nonce});
 
         fields.forEach(function(field) {
             formData.push({name: 'fields[]', value: field});
         });
 
         $.ajax({
-            url: ngo_ajax_obj.ajax_url,
+            url: ngo_tools_ajax_obj.ajax_url,
             type: 'POST',
             data: formData,
             dataType: 'json',

@@ -13,12 +13,12 @@ if (!defined('ABSPATH')) {
 }
 
 // Load plugin textdomain
-function ngo_load_textdomain()
+function ngo_tools_load_textdomain()
 {
     load_plugin_textdomain('newsletter', false, dirname(plugin_basename(__FILE__)) . '/languages/');
 }
 
-add_action('plugins_loaded', 'ngo_load_textdomain');
+add_action('plugins_loaded', 'ngo_tools_load_textdomain');
 
 // Enqueue JS and localize AJAX URL + nonce
 add_action('wp_enqueue_scripts', function () {
@@ -29,21 +29,21 @@ add_action('wp_enqueue_scripts', function () {
         '1.4',
         true
     );
-    wp_localize_script('newsletter-form-js', 'ngo_ajax_obj', [
+    wp_localize_script('newsletter-form-js', 'ngo_tools_ajax_obj', [
         'ajax_url' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('ngo_nonce')
+        'nonce' => wp_create_nonce('ngo_tools_nonce')
     ]);
 });
 
 // Allowed fields
-function ngo_get_allowed_fields()
+function ngo_tools_get_allowed_fields()
 {
     return ['firstName', 'lastName', 'email'];
 }
 
 // Shortcode to render form
 add_shortcode('newsletter_api_form', function ($atts) {
-    $allowed_fields = ngo_get_allowed_fields();
+    $allowed_fields = ngo_tools_get_allowed_fields();
 
     $atts = shortcode_atts([
         'fields' => 'firstname,lastname,email'
@@ -57,13 +57,13 @@ add_shortcode('newsletter_api_form', function ($atts) {
 
     ob_start();
     ?>
-    <form id="newsletter-form" class="newsletter-form" method="post" novalidate>
+    <form id="ngo-tools-newsletter-form" class="newsletter-form" method="post" novalidate>
         <?php foreach ($fields as $field):
-            $name_attr = 'ngo_' . $field;
+            $name_attr = 'ngo_tools_' . $field;
             $label = ucfirst($field);
             $type = ($field === 'email') ? 'email' : 'text';
             ?>
-            <label><?php echo esc_html($label); ?><br>
+            <label class="ngo_tools_newsletter_form_label"><?php echo esc_html($label); ?><br>
                 <input type="<?php echo esc_attr($type); ?>" name="<?php echo esc_attr($name_attr); ?>" required>
             </label><br>
         <?php endforeach; ?>
@@ -75,14 +75,14 @@ add_shortcode('newsletter_api_form', function ($atts) {
 });
 
 // AJAX handler
-add_action('wp_ajax_nopriv_ngo_submit_form', 'ngo_ajax_form_handler');
-add_action('wp_ajax_ngo_submit_form', 'ngo_ajax_form_handler');
+add_action('wp_ajax_nopriv_ngo_tools_submit_form', 'ngo_tools_ajax_form_handler');
+add_action('wp_ajax_ngo_tools_submit_form', 'ngo_tools_ajax_form_handler');
 
-function ngo_ajax_form_handler()
+function ngo_tools_ajax_form_handler()
 {
-    check_ajax_referer('ngo_nonce', 'nonce');
+    check_ajax_referer('ngo_tools_nonce', 'nonce');
 
-    $allowed_fields = ngo_get_allowed_fields();
+    $allowed_fields = ngo_tools_get_allowed_fields();
     $requested_fields = isset($_POST['fields']) ? (array)$_POST['fields'] : [];
     $fields = array_intersect($requested_fields, $allowed_fields);
 
@@ -94,7 +94,7 @@ function ngo_ajax_form_handler()
     $errors = [];
 
     foreach ($fields as $field) {
-        $key = 'ngo_' . $field;
+        $key = 'ngo_tools_' . $field;
         if (empty($_POST[$key])) {
             $errors[] = sprintf(__('Please fill the %s field.', 'newsletter'), ucfirst($field));
         } else {
@@ -111,16 +111,16 @@ function ngo_ajax_form_handler()
     }
 
     // Get Bearer Token, API URL and selected segment from options
-    $bearer_token = get_option('ngo_newsletter_api_bearer_token', '');
-    $organization_name = get_option('ngo_newsletter_organization_name', '');
-    $segment_id = get_option('ngo_newsletter_api_segment', '');
+    $bearer_token = get_option('ngo_tools_newsletter_api_bearer_token', '');
+    $organization_name = get_option('ngo_tools_newsletter_organization_name', '');
+    $segment_id = get_option('ngo_tools_newsletter_api_segment', '');
 
     if (empty($organization_name)) {
         wp_send_json_error(['messages' => [__('API endpoint URL is not configured.', 'newsletter')]]);
     }
 
     // cURL request
-    $ch = curl_init(ngo_subscribe_contact_segments_url($organization_name, $segment_id));
+    $ch = curl_init(ngo_tools_subscribe_contact_segments_url($organization_name, $segment_id));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
@@ -145,55 +145,55 @@ function ngo_ajax_form_handler()
 }
 
 // Admin menu and settings
-add_action('admin_menu', 'ngo_add_settings_page');
-add_action('admin_init', 'ngo_register_settings');
+add_action('admin_menu', 'ngo_tools_add_settings_page');
+add_action('admin_init', 'ngo_tools_register_settings');
 
-function ngo_get_contact_segments_url($organizationName){
+function ngo_tools_get_contact_segments_url($organizationName){
     return "https://$organizationName.ngo.tools/api/v2/contact-segments";
 }
-function ngo_subscribe_contact_segments_url($organizationName, $segmentId){
+function ngo_tools_subscribe_contact_segments_url($organizationName, $segmentId){
     return "https://$organizationName.ngo.tools/api/v2/contact-segments/$segmentId/subscribe";
 }
 
-function ngo_add_settings_page()
+function ngo_tools_add_settings_page()
 {
     add_options_page(
         __('Newsletter API Settings', 'newsletter'),
         __('Newsletter API', 'newsletter'),
         'manage_options',
         'ngo-newsletter-api',
-        'ngo_render_settings_page'
+        'ngo_tools_render_settings_page'
     );
 }
 
-function ngo_register_settings()
+function ngo_tools_register_settings()
 {
-    register_setting('ngo_newsletter_api_options', 'ngo_newsletter_api_bearer_token', [
+    register_setting('ngo_tools_newsletter_api_options', 'ngo_tools_newsletter_api_bearer_token', [
         'type' => 'string',
         'sanitize_callback' => 'sanitize_text_field',
     ]);
-    register_setting('ngo_newsletter_api_options', 'ngo_newsletter_organization_name', [
+    register_setting('ngo_tools_newsletter_api_options', 'ngo_tools_newsletter_organization_name', [
         'type' => 'string',
         'sanitize_callback' => 'sanitize_text_field',
     ]);
-    register_setting('ngo_newsletter_api_options', 'ngo_newsletter_api_segment', [
+    register_setting('ngo_tools_newsletter_api_options', 'ngo_tools_newsletter_api_segment', [
         'type' => 'string',
         'sanitize_callback' => 'sanitize_text_field',
     ]);
 }
 
-function ngo_render_settings_page()
+function ngo_tools_render_settings_page()
 {
-    $bearer_token = get_option('ngo_newsletter_api_bearer_token', '');
-    $organizationName = get_option('ngo_newsletter_organization_name', '');
-    $selected_segment = get_option('ngo_newsletter_api_segment', '');
+    $bearer_token = get_option('ngo_tools_newsletter_api_bearer_token', '');
+    $organizationName = get_option('ngo_tools_newsletter_organization_name', '');
+    $selected_segment = get_option('ngo_tools_newsletter_api_segment', '');
 
     // Prepare segments array
     $segments = [];
 
     if ($bearer_token && $organizationName) {
 
-        $ch = curl_init(ngo_get_contact_segments_url($organizationName));
+        $ch = curl_init(ngo_tools_get_contact_segments_url($organizationName));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -230,21 +230,21 @@ function ngo_render_settings_page()
         <h1><?php esc_html_e('Newsletter API Settings', 'newsletter'); ?></h1>
         <form method="post" action="options.php">
             <?php
-            settings_fields('ngo_newsletter_api_options');
-            do_settings_sections('ngo_newsletter_api_options');
+            settings_fields('ngo_tools_newsletter_api_options');
+            do_settings_sections('ngo_tools_newsletter_api_options');
             ?>
             <table class="form-table">
                 <tr valign="top">
                     <th scope="row"><?php esc_html_e('API Bearer Token', 'newsletter'); ?></th>
                     <td>
-                        <input type="password" name="ngo_newsletter_api_bearer_token"
+                        <input type="password" name="ngo_tools_newsletter_api_bearer_token"
                                value="<?php echo esc_attr($bearer_token); ?>" class="regular-text" autocomplete="off"/>
                     </td>
                 </tr>
                 <tr valign="top">
                     <th scope="row"><?php esc_html_e('Organization name', 'newsletter'); ?></th>
                     <td>
-                        <input type="text" name="ngo_newsletter_organization_name" value="<?php echo esc_attr($organizationName); ?>"
+                        <input type="text" name="ngo_tools_newsletter_organization_name" value="<?php echo esc_attr($organizationName); ?>"
                                class="regular-text"/>
                     </td>
                 </tr>
@@ -252,7 +252,7 @@ function ngo_render_settings_page()
                     <tr valign="top">
                         <th scope="row"><?php esc_html_e('Select Segment', 'newsletter'); ?></th>
                         <td>
-                            <select name="ngo_newsletter_api_segment">
+                            <select name="ngo_tools_newsletter_api_segment">
                                 <option value=""><?php esc_html_e('Please select a segment', 'newsletter'); ?></option>
                                 <?php foreach ($segments as $segment):
                                     $id = isset($segment['id']) ? $segment['id'] : '';
