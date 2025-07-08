@@ -132,11 +132,21 @@ function ngo_tools_ajax_form_handler()
     $curl_error = curl_error($ch);
     curl_close($ch);
 
+    // Detect redirection to login page when bearer token is expired or invalid
+    preg_match('/login/', strtolower($response), $matchesLoginRedirection);
     if ($curl_error) {
-        wp_send_json_error(['messages' => [__('Failed to subscribe: ', 'ngo_tools_newsletter') . $curl_error]]);
+        wp_send_json_error(['messages' => [__('Failed to subscribe: ', 'ngo_tools_newsletter') . $curl_error], 'success' => false]);
+    } elseif (!empty($matchesLoginRedirection)) {
+        wp_send_json_error(['messages' => [__('Failed to subscribe: ', 'ngo_tools_newsletter')
+                . __('The token seems to be expired', 'ngo_tools_newsletter') ], 'success' => false]);
+    } elseif (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 404) {
+        wp_send_json_error(['messages' => [__('Failed to subscribe: ', 'ngo_tools_newsletter')
+                . __('Endpoint not found!', 'ngo_tools_newsletter')], 'success' => false]);
+    } elseif (in_array(curl_getinfo($ch, CURLINFO_HTTP_CODE), [200, 201])) {
+        wp_send_json_success(['messages' => [__('Thank you for subscribing!', 'ngo_tools_newsletter')]]);
+    } else {
+        wp_send_json_error(['messages' => [__('Failed to subscribe: ', 'ngo_tools_newsletter') . 'Unkown error']]);
     }
-
-    wp_send_json_success(['messages' => [__('Thank you for subscribing!', 'ngo_tools_newsletter')]]);
 }
 
 // Admin menu and settings
