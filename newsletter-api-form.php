@@ -107,7 +107,7 @@ function ngo_tools_ajax_form_handler()
     }
 
     // Get Bearer Token, API URL and selected segment from options
-    $encryption = new NGO_Data_Encryption();
+    $encryption = new NGO_DataEncryption();
     $encrypted_token = get_option('ngo_tools_newsletter_api_bearer_token', '');
     $bearer_token = $encrypted_token ? $encryption->decrypt($encrypted_token) : '';
     $organization_name = get_option('ngo_tools_newsletter_organization_name', '');
