@@ -11,6 +11,7 @@ Domain Path: /languages
 if (!defined('ABSPATH')) {
     exit;
 }
+require_once('NGO_DataEncryption.php');
 
 // Load plugin textdomain
 function ngo_tools_load_textdomain()
@@ -106,7 +107,9 @@ function ngo_tools_ajax_form_handler()
     }
 
     // Get Bearer Token, API URL and selected segment from options
-    $bearer_token = get_option('ngo_tools_newsletter_api_bearer_token', '');
+    $encryption = new NGO_Data_Encryption();
+    $encrypted_token = get_option('ngo_tools_newsletter_api_bearer_token', '');
+    $bearer_token = $encrypted_token ? $encryption->decrypt($encrypted_token) : '';
     $organization_name = get_option('ngo_tools_newsletter_organization_name', '');
     $segment_id = get_option('ngo_tools_newsletter_api_segment', '');
 
@@ -175,7 +178,7 @@ function ngo_tools_register_settings()
 {
     register_setting('ngo_tools_newsletter_api_options', 'ngo_tools_newsletter_api_bearer_token', [
         'type' => 'string',
-        'sanitize_callback' => 'sanitize_text_field',
+        'sanitize_callback' => 'ngo_sanitize_bearer_token',
     ]);
     register_setting('ngo_tools_newsletter_api_options', 'ngo_tools_newsletter_organization_name', [
         'type' => 'string',
@@ -186,10 +189,19 @@ function ngo_tools_register_settings()
         'sanitize_callback' => 'sanitize_text_field',
     ]);
 }
+function ngo_sanitize_bearer_token($input) {
+    $input = sanitize_text_field($input);
+    $encryption = new NGO_DataEncryption();
+
+    // Encrypt token before saving
+    return $encryption->encrypt($input);
+}
 
 function ngo_tools_render_settings_page()
 {
-    $bearer_token = get_option('ngo_tools_newsletter_api_bearer_token', '');
+    $encryption = new NGO_DataEncryption();
+    $encrypted_token = get_option('ngo_tools_newsletter_api_bearer_token', '');
+    $bearer_token = $encrypted_token ? $encryption->decrypt($encrypted_token) : '';
     $organizationName = get_option('ngo_tools_newsletter_organization_name', '');
     $selected_segment = get_option('ngo_tools_newsletter_api_segment', '');
 
