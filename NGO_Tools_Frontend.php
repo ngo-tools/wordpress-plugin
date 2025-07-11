@@ -130,7 +130,11 @@ final class NGO_Tools_Frontend {
         } elseif (!empty($matchesLoginRedirection)) {
             wp_send_json_error(['messages' => [__('Failed to subscribe: ', 'ngo_tools_newsletter') . __('The token seems to be expired', 'ngo_tools_newsletter')], 'success' => false]);
         } elseif ($response['response']['code'] === 404) {
-            wp_send_json_error(['messages' => [__('Failed to subscribe: ', 'ngo_tools_newsletter') . __('Endpoint not found!', 'ngo_tools_newsletter')], 'success' => false]);
+            if(empty($segment_id)){
+                wp_send_json_error(['messages' => [__('Failed to subscribe: the newsletter segment is not selected', 'ngo_tools_newsletter') ], 'success' => false]);
+            } else {
+                wp_send_json_error(['messages' => [__('Failed to subscribe: ', 'ngo_tools_newsletter') . __('Endpoint not found!', 'ngo_tools_newsletter')], 'success' => false]);
+            }
         } elseif (in_array($response['response']['code'], [200, 201], true)) {
             wp_send_json_success(['messages' => [__('Thank you for subscribing!', 'ngo_tools_newsletter')]]);
         } else {

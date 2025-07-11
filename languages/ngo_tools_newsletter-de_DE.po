@@ -66,6 +66,9 @@ msgstr "Nachname"
 msgid "i.e.: organization.ngo.tools"
 msgstr "z. B.: organisation.ngo.tools"
 
+msgid "Failed to subscribe: the newsletter segment is not selected"
+msgstr "Anmeldung fehlgeschlagen: Das Newsletter-Segment ist nicht ausgewählt"
+
 msgid "Unexpected Error.  Please verify the bearer token and the organization name"
 msgstr "Unerwarteter Fehler. Bitte überprüfen Sie den Bearer-Token und den Organisationsnamen"
 
