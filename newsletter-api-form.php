@@ -263,7 +263,11 @@ function ngo_tools_render_settings_page()
             ?>
             <table class="form-table">
                 <tr valign="top">
-                    <th scope="row"><?php esc_html_e('API Bearer Token', 'ngo_tools_newsletter'); ?></th>
+                    <th scope="row">
+                        <?php esc_html_e('API Bearer Token', 'ngo_tools_newsletter'); ?>
+                        <p class="description"><?php esc_html_e("You can generate your token in the Profile area under ".
+                                "the \"API Token\" section", 'ngo_tools_newsletter' ) ?></p>
+                    </th>
                     <td>
                         <input type="text" name="ngo_tools_newsletter_api_bearer_token" value=""
                                class="regular-text" autocomplete="off"
@@ -271,7 +275,12 @@ function ngo_tools_render_settings_page()
                     </td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row"><?php esc_html_e('Organization name', 'ngo_tools_newsletter'); ?></th>
+                    <th scope="row">
+                        <?php esc_html_e('Organization name', 'ngo_tools_newsletter'); ?>
+                        <p class="description"><?php esc_html_e('Your organization name is the first part of the URL. ' .
+                        'For example, if your URL is examplename.ngo.tools/app/dashboard, ' .
+                        'the value to enter is examplename.ngo.tools.', 'ngo_tools_newsletter') ?></p>
+                    </th>
                     <td>
                         <input type="text" name="ngo_tools_newsletter_organization_name" value="<?php echo esc_attr($organizationName); ?>"
                                class="regular-text"

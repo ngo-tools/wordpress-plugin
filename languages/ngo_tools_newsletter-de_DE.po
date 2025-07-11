@@ -63,6 +63,9 @@ msgstr "Vorname"
 msgid "lastName"
 msgstr "Nachname"
 
+msgid "i.e.: organization.ngo.tools"
+msgstr "z. B.: organisation.ngo.tools"
+
 msgid "Unexpected Error.  Please verify the bearer token and the organization name"
 msgstr "Unerwarteter Fehler. Bitte überprüfen Sie den Bearer-Token und den Organisationsnamen"
 
@@ -71,3 +74,9 @@ msgstr "Der Organisationsname darf nicht leer sein und muss mit <b>.ngo.tools</b
 
 msgid "Enter a value if you want to set a new token"
 msgstr "Wert eingeben, um einen neuen Token zu setzen"
+
+msgid "You can generate your token in the Profile area under the \"API Token\" section"
+msgstr "Sie können Ihr Token im „Profil“ Bereich unter dem Abschnitt \"API-Token\" generieren."
+
+msgid "Your organization name is the first part of the URL. For example, if your URL is examplename.ngo.tools/app/dashboard, the value to enter is examplename.ngo.tools."
+msgstr "Der Name Ihrer Organisation ist der erste Teil der URL. Zum Beispiel, wenn Ihre URL examplename.ngo.tools/app/dashboard lautet, geben Sie als Wert examplename.ngo.tools ein."
