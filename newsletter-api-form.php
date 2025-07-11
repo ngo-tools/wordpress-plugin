@@ -179,6 +179,9 @@ function ngo_tools_register_settings()
 }
 function ngo_sanitize_bearer_token($input) {
     $input = sanitize_text_field($input);
+    if(empty($input)) {
+        return esc_attr(get_option('ngo_tools_newsletter_api_bearer_token', ''));
+    }
     $encryption = new NGO_DataEncryption();
 
     // Encrypt token before saving
@@ -262,15 +265,17 @@ function ngo_tools_render_settings_page()
                 <tr valign="top">
                     <th scope="row"><?php esc_html_e('API Bearer Token', 'ngo_tools_newsletter'); ?></th>
                     <td>
-                        <input type="password" name="ngo_tools_newsletter_api_bearer_token"
-                               value="<?php echo esc_attr($bearer_token); ?>" class="regular-text" autocomplete="off"/>
+                        <input type="text" name="ngo_tools_newsletter_api_bearer_token" value=""
+                               class="regular-text" autocomplete="off"
+                               placeholder ="<?php esc_html_e('Enter a value if you want to set a new token', 'ngo_tools_newsletter'); ?>"/>
                     </td>
                 </tr>
                 <tr valign="top">
                     <th scope="row"><?php esc_html_e('Organization name', 'ngo_tools_newsletter'); ?></th>
                     <td>
                         <input type="text" name="ngo_tools_newsletter_organization_name" value="<?php echo esc_attr($organizationName); ?>"
-                               class="regular-text"/>
+                               class="regular-text"
+                               placeholder ="<?php esc_html_e('i.e.: organization.ngo.tools', 'ngo_tools_newsletter'); ?>"/>
                     </td>
                 </tr>
                 <?php if ($bearer_token && $segments): ?>

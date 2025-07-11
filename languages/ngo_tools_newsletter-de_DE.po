@@ -43,7 +43,7 @@ msgid "Please select a segment"
 msgstr "Bitte wählen Sie ein Segment"
 
 msgid "The token seems to be expired"
-msgstr "Das Token scheint abgelaufen zu sein"
+msgstr "Der Token scheint abgelaufen zu sein"
 
 msgid "First Name"
 msgstr "Vorname"
@@ -64,7 +64,10 @@ msgid "lastName"
 msgstr "Nachname"
 
 msgid "Unexpected Error.  Please verify the bearer token and the organization name"
-msgstr "Unerwarteter Fehler. Bitte überprüfen Sie das Bearer-Token und den Organisationsnamen"
+msgstr "Unerwarteter Fehler. Bitte überprüfen Sie den Bearer-Token und den Organisationsnamen"
 
 msgid "The organisation name can't be empty and must end with <b>.ngo.tools</b>"
 msgstr "Der Organisationsname darf nicht leer sein und muss mit <b>.ngo.tools</b> enden"
+
+msgid "Enter a value if you want to set a new token"
+msgstr "Wert eingeben, um einen neuen Token zu setzen"
