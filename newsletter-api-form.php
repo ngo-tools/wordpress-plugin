@@ -81,7 +81,6 @@ function ngo_tools_ajax_form_handler()
 
     $fields = isset($_POST['fields']) ? (array)$_POST['fields'] : [];
 
-
     if (empty($fields)) {
         wp_send_json_error(['messages' => [__('No valid fields specified.', 'ngo_tools_newsletter')]]);
     }
@@ -112,40 +111,29 @@ function ngo_tools_ajax_form_handler()
     $bearer_token = $encrypted_token ? $encryption->decrypt($encrypted_token) : '';
     $organization_name = get_option('ngo_tools_newsletter_organization_name', '');
     $segment_id = get_option('ngo_tools_newsletter_api_segment', '');
+    $endpoint_url = ngo_tools_subscribe_contact_segments_url($organization_name, $segment_id);
 
-    if (empty($organization_name)) {
-        wp_send_json_error(['messages' => [__('API endpoint URL is not configured.', 'ngo_tools_newsletter')]]);
-    }
+    $args = array_merge(
+        ngo_tools_get_default_arguments($bearer_token),
+        ['body'    => json_encode($data)]
+    );
 
-    // cURL request
-    $ch = curl_init(ngo_tools_subscribe_contact_segments_url($organization_name, $segment_id));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-
-    $headers = ['Content-Type: application/json'];
-    if ($bearer_token) {
-        $headers[] = 'Authorization: Bearer ' . $bearer_token;
-    }
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-
-    $response = curl_exec($ch);
-    $curl_error = curl_error($ch);
-    curl_close($ch);
+    $response = wp_remote_post($endpoint_url, $args);
+    $body = wp_remote_retrieve_body($response);
 
     // Detect redirection to login page when bearer token is expired or invalid
-    preg_match('/login/', strtolower($response), $matchesLoginRedirection);
-    if ($curl_error) {
-        wp_send_json_error(['messages' => [__('Failed to subscribe: ', 'ngo_tools_newsletter') . $curl_error], 'success' => false]);
+    preg_match('/login/', strtolower($body), $matchesLoginRedirection);
+
+    if (is_wp_error($response)) {
+        $error_message = $response->get_error_message();
+        wp_send_json_error(['messages' => [__('Failed to subscribe: ', 'ngo_tools_newsletter') . $error_message]]);
     } elseif (!empty($matchesLoginRedirection)) {
         wp_send_json_error(['messages' => [__('Failed to subscribe: ', 'ngo_tools_newsletter')
-                . __('The token seems to be expired', 'ngo_tools_newsletter') ], 'success' => false]);
-    } elseif (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 404) {
+            . __('The token seems to be expired', 'ngo_tools_newsletter')], 'success' => false]);
+    } elseif ($response['response']['code'] == 404) {
         wp_send_json_error(['messages' => [__('Failed to subscribe: ', 'ngo_tools_newsletter')
-                . __('Endpoint not found!', 'ngo_tools_newsletter')], 'success' => false]);
-    } elseif (in_array(curl_getinfo($ch, CURLINFO_HTTP_CODE), [200, 201])) {
+            . __('Endpoint not found!', 'ngo_tools_newsletter')], 'success' => false]);
+    } elseif (in_array($response['response']['code'], [200, 201])) {
         wp_send_json_success(['messages' => [__('Thank you for subscribing!', 'ngo_tools_newsletter')]]);
     } else {
         wp_send_json_error(['messages' => [__('Failed to subscribe: ', 'ngo_tools_newsletter') . 'Unkown error']]);
@@ -197,6 +185,17 @@ function ngo_sanitize_bearer_token($input) {
     return $encryption->encrypt($input);
 }
 
+function ngo_tools_get_default_arguments($bearer_token){
+    return $args = [
+        'headers' => [
+            'Content-Type'  => 'application/json',
+            'Authorization' => $bearer_token ? 'Bearer ' . $bearer_token : '',
+        ],
+        'timeout' => 15,
+        'sslverify' => false,
+    ];
+}
+
 function ngo_tools_render_settings_page()
 {
     $encryption = new NGO_DataEncryption();
@@ -209,24 +208,17 @@ function ngo_tools_render_settings_page()
     $segments = [];
 
     if ($bearer_token && $organizationName) {
+        $endpoint_url = ngo_tools_get_contact_segments_url($organizationName);
+        $args = ngo_tools_get_default_arguments($bearer_token);
 
-        $ch = curl_init(ngo_tools_get_contact_segments_url($organizationName));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Authorization: Bearer ' . $bearer_token,
-            'Content-Type: application/json',
-        ]);
-        $response = curl_exec($ch);
-        $curl_error = curl_error($ch);
-        curl_close($ch);
+        $response = wp_remote_get($endpoint_url, $args);
+        $body = wp_remote_retrieve_body($response);
 
         // Manual handling for API redirection to login page when token is invalid or expired
-        preg_match('/login/', strtolower($response), $matches);
+        preg_match('/login/', strtolower($body), $matches);
 
-        if (!$curl_error && $response) {
-            $json = json_decode($response, true);
+        if (!is_wp_error($response) && $response) {
+            $json = json_decode($body, true);
             if (isset($json['data']) && is_array($json['data'])) {
                 $segments = $json['data'];
             } else {
@@ -235,11 +227,14 @@ function ngo_tools_render_settings_page()
                         esc_html_e('The token seems to be expired', 'ngo_tools_newsletter');
                     echo "</p></div>";
                 } else {
-                    echo "<div class=\"notice notice-error\"><p>$response</p></div>";
+                    echo "<div class=\"notice notice-error\"><p>";
+                        esc_html_e('Unexpected Error.  Please verify the bearer token and the organization name', 'ngo_tools_newsletter');
+                    echo "</p></div>";
                 }
             }
         } else {
-            echo "<div class=\"notice notice-error\"><p>$curl_error</p></div>";
+            $error_message = $response->get_error_message();
+            echo "<div class=\"notice notice-error\"><p>$error_message</p></div>";
         }
     }
     ?>

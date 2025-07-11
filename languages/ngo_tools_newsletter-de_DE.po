@@ -62,3 +62,6 @@ msgstr "Vorname"
 
 msgid "lastName"
 msgstr "Nachname"
+
+msgid "Unexpected Error.  Please verify the bearer token and the organization name"
+msgstr "Unerwarteter Fehler. Bitte überprüfen Sie das Bearer-Token und den Organisationsnamen"
