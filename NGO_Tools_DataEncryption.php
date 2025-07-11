@@ -1,6 +1,6 @@
 <?php
 
-class NGO_DataEncryption
+class NGO_Tools_DataEncryption
 {
     private $key;
 

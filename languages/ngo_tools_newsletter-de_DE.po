@@ -69,8 +69,8 @@ msgstr "z. B.: organisation.ngo.tools"
 msgid "Unexpected Error.  Please verify the bearer token and the organization name"
 msgstr "Unerwarteter Fehler. Bitte überprüfen Sie den Bearer-Token und den Organisationsnamen"
 
-msgid "The organisation name can't be empty and must end with <b>.ngo.tools</b>"
-msgstr "Der Organisationsname darf nicht leer sein und muss mit <b>.ngo.tools</b> enden"
+msgid "The organisation name can't be empty and must end with .ngo.tools"
+msgstr "Der Organisationsname darf nicht leer sein und muss mit .ngo.tools enden"
 
 msgid "Enter a value if you want to set a new token"
 msgstr "Wert eingeben, um einen neuen Token zu setzen"
