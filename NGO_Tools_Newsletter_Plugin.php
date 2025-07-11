@@ -16,7 +16,7 @@ final class NGO_Tools_Newsletter_Plugin {
         add_action('plugins_loaded', [$this, 'load_textdomain']);
 
         // Initialize admin and frontend classes
-        if (is_admin()) {
+        if (is_admin() && ! wp_doing_ajax()) {
             NGO_Tools_Admin::get_instance($this->encryption);
         } else {
             NGO_Tools_Frontend::get_instance($this->encryption);
