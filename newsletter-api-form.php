@@ -145,10 +145,10 @@ add_action('admin_menu', 'ngo_tools_add_settings_page');
 add_action('admin_init', 'ngo_tools_register_settings');
 
 function ngo_tools_get_contact_segments_url($organizationName){
-    return "https://$organizationName.ngo.tools/api/v2/contact-segments";
+    return "https://$organizationName/api/v2/contact-segments";
 }
 function ngo_tools_subscribe_contact_segments_url($organizationName, $segmentId){
-    return "https://$organizationName.ngo.tools/api/v2/contact-segments/$segmentId/subscribe";
+    return "https://$organizationName/api/v2/contact-segments/$segmentId/subscribe";
 }
 
 function ngo_tools_add_settings_page()
@@ -196,6 +196,11 @@ function ngo_tools_get_default_arguments($bearer_token){
     ];
 }
 
+function ngo_tools_is_valid_organization_name($organization_name){
+    preg_match('/.+\.ngo\.tools$/m', $organization_name, $matches);
+    return !empty($matches);
+}
+
 function ngo_tools_render_settings_page()
 {
     $encryption = new NGO_DataEncryption();
@@ -207,7 +212,15 @@ function ngo_tools_render_settings_page()
     // Prepare segments array
     $segments = [];
 
-    if ($bearer_token && $organizationName) {
+    // Validate the organization name
+    if(!$is_valid_organization_name = ngo_tools_is_valid_organization_name($organizationName)) {
+        echo "<div class=\"notice notice-error\"><p>";
+        echo __("The organisation name can't be empty and must end with <b>.ngo.tools</b>", 'ngo_tools_newsletter');
+        echo "</p></div>";
+    }
+
+    // Retrieve the segments if the bearer token is not empty and the organization name is set
+    if (!empty($bearer_token) && $is_valid_organization_name) {
         $endpoint_url = ngo_tools_get_contact_segments_url($organizationName);
         $args = ngo_tools_get_default_arguments($bearer_token);
 
