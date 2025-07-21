@@ -45,6 +45,9 @@ final class NGO_Tools_Frontend {
         ob_start();
         ?>
         <form id="ngo-tools-newsletter-form" class="ngo_tools_newsletter-form" method="post" novalidate>
+            <div style="position:absolute;left:-99999px;top:auto;width:1px;height:1px;overflow:hidden;">
+                <?php $this->render_input('text', 'hp', __('Leave this field empty', 'ngo_tools_newsletter'), $attributes); ?>
+            </div>
             <?php $this->render_input('text', 'firstName', __('First Name', 'ngo_tools_newsletter'), $attributes); ?>
             <?php $this->render_input('text', 'lastName', __('Last Name', 'ngo_tools_newsletter'), $attributes); ?>
             <?php $this->render_input('email', 'email', __('Email', 'ngo_tools_newsletter'), $attributes); ?>
@@ -80,16 +83,19 @@ final class NGO_Tools_Frontend {
     public function ajax_form_handler() {
         check_ajax_referer('ngo_tools_nonce', 'nonce');
 
-        $fields = isset($_POST['fields']) ? (array) $_POST['fields'] : ['firstName', 'lastName', 'email'];
+        $required_fields = ['firstName', 'lastName', 'email'];
 
-        if (empty($fields)) {
+        if (empty($required_fields)) {
             wp_send_json_error(['messages' => [__('No valid fields specified.', 'ngo_tools_newsletter')]]);
+        } elseif(!empty($_POST['ngo_tools_hp'])){
+            // honeypot filled in? Spambot detected
+            wp_send_json_error(['messages' => [__('Spam detected!', 'ngo_tools_newsletter') ], 'success' => false]);
         }
 
         $data = [];
         $errors = [];
 
-        foreach ($fields as $field) {
+        foreach ($required_fields as $field) {
             $key = 'ngo_tools_' . $field;
             if (empty($_POST[$key])) {
                 $errors[] = sprintf(__('Please fill the %s field.', 'ngo_tools_newsletter'), ucfirst($field));
