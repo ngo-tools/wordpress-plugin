@@ -152,6 +152,7 @@ final class NGO_Tools_Frontend {
         return [
             'headers' => [
                 'Content-Type'  => 'application/json',
+                'Accept' => 'application/json',
                 'Authorization' => $bearer_token ? 'Bearer ' . $bearer_token : '',
             ],
             'timeout'   => 15,
